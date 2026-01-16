@@ -9,7 +9,6 @@ class ServerpodClientConfig {
   static void initialize() {
     client = Client(
       'http://localhost:8083/',
-      authenticationKeyManager: FlutterAuthenticationKeyManager(),
-    );
+    )..connectivityMonitor = FlutterConnectivityMonitor();
   }
 }
