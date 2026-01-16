@@ -1,4 +1,4 @@
-class: Transaction
+class: ExpenseTransaction
 table: transactions
 fields:
   walletId: int

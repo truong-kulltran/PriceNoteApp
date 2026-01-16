@@ -15,6 +15,10 @@ import 'category.dart' as _i3;
 import 'transaction.dart' as _i4;
 import 'user.dart' as _i5;
 import 'wallet.dart' as _i6;
+import 'package:learn_dart_serverpod_client/src/protocol/category.dart' as _i7;
+import 'package:learn_dart_serverpod_client/src/protocol/transaction.dart'
+    as _i8;
+import 'package:learn_dart_serverpod_client/src/protocol/wallet.dart' as _i9;
 export 'greeting.dart';
 export 'category.dart';
 export 'transaction.dart';
@@ -41,8 +45,8 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i3.Category) {
       return _i3.Category.fromJson(data) as T;
     }
-    if (t == _i4.Transaction) {
-      return _i4.Transaction.fromJson(data) as T;
+    if (t == _i4.ExpenseTransaction) {
+      return _i4.ExpenseTransaction.fromJson(data) as T;
     }
     if (t == _i5.User) {
       return _i5.User.fromJson(data) as T;
@@ -56,14 +60,36 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i1.getType<_i3.Category?>()) {
       return (data != null ? _i3.Category.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i4.Transaction?>()) {
-      return (data != null ? _i4.Transaction.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i4.ExpenseTransaction?>()) {
+      return (data != null ? _i4.ExpenseTransaction.fromJson(data) : null) as T;
     }
     if (t == _i1.getType<_i5.User?>()) {
       return (data != null ? _i5.User.fromJson(data) : null) as T;
     }
     if (t == _i1.getType<_i6.Wallet?>()) {
       return (data != null ? _i6.Wallet.fromJson(data) : null) as T;
+    }
+    if (t == Map<String, dynamic>) {
+      return (data as Map).map((k, v) =>
+          MapEntry(deserialize<String>(k), deserialize<dynamic>(v))) as T;
+    }
+    if (t == List<Map<String, dynamic>>) {
+      return (data as List)
+          .map((e) => deserialize<Map<String, dynamic>>(e))
+          .toList() as T;
+    }
+    if (t == List<_i7.Category>) {
+      return (data as List).map((e) => deserialize<_i7.Category>(e)).toList()
+          as T;
+    }
+    if (t == List<_i8.ExpenseTransaction>) {
+      return (data as List)
+          .map((e) => deserialize<_i8.ExpenseTransaction>(e))
+          .toList() as T;
+    }
+    if (t == List<_i9.Wallet>) {
+      return (data as List).map((e) => deserialize<_i9.Wallet>(e)).toList()
+          as T;
     }
     return super.deserialize<T>(data, t);
   }
@@ -78,8 +104,8 @@ class Protocol extends _i1.SerializationManager {
     if (data is _i3.Category) {
       return 'Category';
     }
-    if (data is _i4.Transaction) {
-      return 'Transaction';
+    if (data is _i4.ExpenseTransaction) {
+      return 'ExpenseTransaction';
     }
     if (data is _i5.User) {
       return 'User';
@@ -102,8 +128,8 @@ class Protocol extends _i1.SerializationManager {
     if (dataClassName == 'Category') {
       return deserialize<_i3.Category>(data['data']);
     }
-    if (dataClassName == 'Transaction') {
-      return deserialize<_i4.Transaction>(data['data']);
+    if (dataClassName == 'ExpenseTransaction') {
+      return deserialize<_i4.ExpenseTransaction>(data['data']);
     }
     if (dataClassName == 'User') {
       return deserialize<_i5.User>(data['data']);

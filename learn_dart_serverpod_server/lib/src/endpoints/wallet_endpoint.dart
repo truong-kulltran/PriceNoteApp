@@ -70,7 +70,7 @@ class WalletEndpoint extends Endpoint {
     }
 
     // Get all transactions for this wallet
-    final transactions = await Transaction.db.find(
+    final transactions = await ExpenseTransaction.db.find(
       session,
       where: (t) => t.walletId.equals(walletId),
     );

@@ -16,6 +16,10 @@ import 'category.dart' as _i4;
 import 'transaction.dart' as _i5;
 import 'user.dart' as _i6;
 import 'wallet.dart' as _i7;
+import 'package:learn_dart_serverpod_server/src/generated/category.dart' as _i8;
+import 'package:learn_dart_serverpod_server/src/generated/transaction.dart'
+    as _i9;
+import 'package:learn_dart_serverpod_server/src/generated/wallet.dart' as _i10;
 export 'greeting.dart';
 export 'category.dart';
 export 'transaction.dart';
@@ -108,7 +112,7 @@ class Protocol extends _i1.SerializationManagerServer {
     ),
     _i2.TableDefinition(
       name: 'transactions',
-      dartName: 'Transaction',
+      dartName: 'ExpenseTransaction',
       schema: 'public',
       module: 'learn_dart_serverpod',
       columns: [
@@ -412,8 +416,8 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i4.Category) {
       return _i4.Category.fromJson(data) as T;
     }
-    if (t == _i5.Transaction) {
-      return _i5.Transaction.fromJson(data) as T;
+    if (t == _i5.ExpenseTransaction) {
+      return _i5.ExpenseTransaction.fromJson(data) as T;
     }
     if (t == _i6.User) {
       return _i6.User.fromJson(data) as T;
@@ -427,14 +431,36 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i1.getType<_i4.Category?>()) {
       return (data != null ? _i4.Category.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i5.Transaction?>()) {
-      return (data != null ? _i5.Transaction.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i5.ExpenseTransaction?>()) {
+      return (data != null ? _i5.ExpenseTransaction.fromJson(data) : null) as T;
     }
     if (t == _i1.getType<_i6.User?>()) {
       return (data != null ? _i6.User.fromJson(data) : null) as T;
     }
     if (t == _i1.getType<_i7.Wallet?>()) {
       return (data != null ? _i7.Wallet.fromJson(data) : null) as T;
+    }
+    if (t == Map<String, dynamic>) {
+      return (data as Map).map((k, v) =>
+          MapEntry(deserialize<String>(k), deserialize<dynamic>(v))) as T;
+    }
+    if (t == List<Map<String, dynamic>>) {
+      return (data as List)
+          .map((e) => deserialize<Map<String, dynamic>>(e))
+          .toList() as T;
+    }
+    if (t == List<_i8.Category>) {
+      return (data as List).map((e) => deserialize<_i8.Category>(e)).toList()
+          as T;
+    }
+    if (t == List<_i9.ExpenseTransaction>) {
+      return (data as List)
+          .map((e) => deserialize<_i9.ExpenseTransaction>(e))
+          .toList() as T;
+    }
+    if (t == List<_i10.Wallet>) {
+      return (data as List).map((e) => deserialize<_i10.Wallet>(e)).toList()
+          as T;
     }
     try {
       return _i2.Protocol().deserialize<T>(data, t);
@@ -452,8 +478,8 @@ class Protocol extends _i1.SerializationManagerServer {
     if (data is _i4.Category) {
       return 'Category';
     }
-    if (data is _i5.Transaction) {
-      return 'Transaction';
+    if (data is _i5.ExpenseTransaction) {
+      return 'ExpenseTransaction';
     }
     if (data is _i6.User) {
       return 'User';
@@ -480,8 +506,8 @@ class Protocol extends _i1.SerializationManagerServer {
     if (dataClassName == 'Category') {
       return deserialize<_i4.Category>(data['data']);
     }
-    if (dataClassName == 'Transaction') {
-      return deserialize<_i5.Transaction>(data['data']);
+    if (dataClassName == 'ExpenseTransaction') {
+      return deserialize<_i5.ExpenseTransaction>(data['data']);
     }
     if (dataClassName == 'User') {
       return deserialize<_i6.User>(data['data']);
@@ -507,8 +533,8 @@ class Protocol extends _i1.SerializationManagerServer {
     switch (t) {
       case _i4.Category:
         return _i4.Category.t;
-      case _i5.Transaction:
-        return _i5.Transaction.t;
+      case _i5.ExpenseTransaction:
+        return _i5.ExpenseTransaction.t;
       case _i6.User:
         return _i6.User.t;
       case _i7.Wallet:

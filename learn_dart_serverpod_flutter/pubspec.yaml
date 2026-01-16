@@ -28,15 +28,28 @@ dependencies:
   learn_dart_serverpod_client:
     path: ../learn_dart_serverpod_client
 
+  # State Management
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
 
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
+  # Navigation
+  go_router: ^14.6.2
+
+  # UI
   cupertino_icons: ^1.0.5
+  intl: ^0.20.2
+  fl_chart: ^0.70.2
+  
+  # Functional Programming
+  dartz: ^0.10.1
 
 dev_dependencies:
   flutter_lints: '>=3.0.0 <7.0.0'
   flutter_test:
     sdk: flutter
+  riverpod_generator: ^2.6.4
+  build_runner: ^2.4.14
+  riverpod_lint: ^2.6.3
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

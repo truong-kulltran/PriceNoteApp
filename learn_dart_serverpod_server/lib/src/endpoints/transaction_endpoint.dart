@@ -3,9 +3,9 @@ import '../generated/protocol.dart';
 
 class TransactionEndpoint extends Endpoint {
   /// Create a new transaction and update wallet balance
-  Future<Transaction> createTransaction(
+  Future<ExpenseTransaction> createTransaction(
     Session session,
-    Transaction transaction,
+    ExpenseTransaction transaction,
   ) async {
     // Validate transaction data
     if (transaction.amount <= 0) {
@@ -26,7 +26,7 @@ class TransactionEndpoint extends Endpoint {
     transaction.updatedAt = DateTime.now();
 
     // Insert transaction
-    final insertedTransaction = await Transaction.db.insertRow(
+    final insertedTransaction = await ExpenseTransaction.db.insertRow(
       session,
       transaction,
     );
@@ -44,13 +44,13 @@ class TransactionEndpoint extends Endpoint {
   }
 
   /// Get all transactions for a user
-  Future<List<Transaction>> getTransactionsByUserId(
+  Future<List<ExpenseTransaction>> getTransactionsByUserId(
     Session session,
     int userId, {
     int? limit,
     int? offset,
   }) async {
-    return await Transaction.db.find(
+    return await ExpenseTransaction.db.find(
       session,
       where: (t) => t.userId.equals(userId),
       orderBy: (t) => t.transactionDate,
@@ -61,13 +61,13 @@ class TransactionEndpoint extends Endpoint {
   }
 
   /// Get all transactions for a wallet
-  Future<List<Transaction>> getTransactionsByWalletId(
+  Future<List<ExpenseTransaction>> getTransactionsByWalletId(
     Session session,
     int walletId, {
     int? limit,
     int? offset,
   }) async {
-    return await Transaction.db.find(
+    return await ExpenseTransaction.db.find(
       session,
       where: (t) => t.walletId.equals(walletId),
       orderBy: (t) => t.transactionDate,
@@ -78,34 +78,32 @@ class TransactionEndpoint extends Endpoint {
   }
 
   /// Get transactions for a specific date range
-  Future<List<Transaction>> getTransactionsByDateRange(
+  Future<List<ExpenseTransaction>> getTransactionsByDateRange(
     Session session,
     int userId,
     DateTime startDate,
     DateTime endDate,
   ) async {
-    return await Transaction.db.find(
+    return await ExpenseTransaction.db.find(
       session,
-      where: (t) =>
-          t.userId.equals(userId) &
-          t.transactionDate.between(startDate, endDate),
+      where: (t) => t.userId.equals(userId) & t.transactionDate.between(startDate, endDate),
       orderBy: (t) => t.transactionDate,
       orderDescending: true,
     );
   }
 
   /// Get a single transaction by ID
-  Future<Transaction?> getTransactionById(
+  Future<ExpenseTransaction?> getTransactionById(
     Session session,
     int transactionId,
   ) async {
-    return await Transaction.db.findById(session, transactionId);
+    return await ExpenseTransaction.db.findById(session, transactionId);
   }
 
   /// Update a transaction and recalculate wallet balance
-  Future<Transaction> updateTransaction(
+  Future<ExpenseTransaction> updateTransaction(
     Session session,
-    Transaction updatedTransaction,
+    ExpenseTransaction updatedTransaction,
   ) async {
     // Validate
     if (updatedTransaction.amount <= 0) {
@@ -113,7 +111,7 @@ class TransactionEndpoint extends Endpoint {
     }
 
     // Get the old transaction to reverse its effect
-    final oldTransaction = await Transaction.db.findById(
+    final oldTransaction = await ExpenseTransaction.db.findById(
       session,
       updatedTransaction.id!,
     );
@@ -146,7 +144,7 @@ class TransactionEndpoint extends Endpoint {
 
     // Update transaction
     updatedTransaction.updatedAt = DateTime.now();
-    final result = await Transaction.db.updateRow(session, updatedTransaction);
+    final result = await ExpenseTransaction.db.updateRow(session, updatedTransaction);
 
     // Update wallet
     wallet.updatedAt = DateTime.now();
@@ -158,7 +156,7 @@ class TransactionEndpoint extends Endpoint {
   /// Delete a transaction and update wallet balance
   Future<void> deleteTransaction(Session session, int transactionId) async {
     // Get the transaction
-    final transaction = await Transaction.db.findById(session, transactionId);
+    final transaction = await ExpenseTransaction.db.findById(session, transactionId);
     if (transaction == null) {
       throw Exception('Transaction not found');
     }
@@ -181,11 +179,11 @@ class TransactionEndpoint extends Endpoint {
     await Wallet.db.updateRow(session, wallet);
 
     // Delete transaction
-    await Transaction.db.deleteRow(session, transaction);
+    await ExpenseTransaction.db.deleteRow(session, transaction);
   }
 
   /// Get today's transactions for a user
-  Future<List<Transaction>> getTodayTransactions(
+  Future<List<ExpenseTransaction>> getTodayTransactions(
     Session session,
     int userId,
   ) async {
@@ -208,12 +206,9 @@ class TransactionEndpoint extends Endpoint {
     DateTime startDate,
     DateTime endDate,
   ) async {
-    final transactions = await Transaction.db.find(
+    final transactions = await ExpenseTransaction.db.find(
       session,
-      where: (t) =>
-          t.userId.equals(userId) &
-          t.type.equals('income') &
-          t.transactionDate.between(startDate, endDate),
+      where: (t) => t.userId.equals(userId) & t.type.equals('income') & t.transactionDate.between(startDate, endDate),
     );
 
     return transactions.fold<double>(
@@ -229,12 +224,9 @@ class TransactionEndpoint extends Endpoint {
     DateTime startDate,
     DateTime endDate,
   ) async {
-    final transactions = await Transaction.db.find(
+    final transactions = await ExpenseTransaction.db.find(
       session,
-      where: (t) =>
-          t.userId.equals(userId) &
-          t.type.equals('expense') &
-          t.transactionDate.between(startDate, endDate),
+      where: (t) => t.userId.equals(userId) & t.type.equals('expense') & t.transactionDate.between(startDate, endDate),
     );
 
     return transactions.fold<double>(

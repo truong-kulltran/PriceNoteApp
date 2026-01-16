@@ -11,9 +11,9 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 
-abstract class Transaction
+abstract class ExpenseTransaction
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
-  Transaction._({
+  ExpenseTransaction._({
     this.id,
     required this.walletId,
     required this.userId,
@@ -30,7 +30,7 @@ abstract class Transaction
         createdAt = createdAt ?? DateTime.now(),
         updatedAt = updatedAt ?? DateTime.now();
 
-  factory Transaction({
+  factory ExpenseTransaction({
     int? id,
     required int walletId,
     required int userId,
@@ -43,10 +43,10 @@ abstract class Transaction
     double? aiConfidenceScore,
     DateTime? createdAt,
     DateTime? updatedAt,
-  }) = _TransactionImpl;
+  }) = _ExpenseTransactionImpl;
 
-  factory Transaction.fromJson(Map<String, dynamic> jsonSerialization) {
-    return Transaction(
+  factory ExpenseTransaction.fromJson(Map<String, dynamic> jsonSerialization) {
+    return ExpenseTransaction(
       id: jsonSerialization['id'] as int?,
       walletId: jsonSerialization['walletId'] as int,
       userId: jsonSerialization['userId'] as int,
@@ -66,9 +66,9 @@ abstract class Transaction
     );
   }
 
-  static final t = TransactionTable();
+  static final t = ExpenseTransactionTable();
 
-  static const db = TransactionRepository._();
+  static const db = ExpenseTransactionRepository._();
 
   @override
   int? id;
@@ -98,10 +98,10 @@ abstract class Transaction
   @override
   _i1.Table<int?> get table => t;
 
-  /// Returns a shallow copy of this [Transaction]
+  /// Returns a shallow copy of this [ExpenseTransaction]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
-  Transaction copyWith({
+  ExpenseTransaction copyWith({
     int? id,
     int? walletId,
     int? userId,
@@ -151,26 +151,26 @@ abstract class Transaction
     };
   }
 
-  static TransactionInclude include() {
-    return TransactionInclude._();
+  static ExpenseTransactionInclude include() {
+    return ExpenseTransactionInclude._();
   }
 
-  static TransactionIncludeList includeList({
-    _i1.WhereExpressionBuilder<TransactionTable>? where,
+  static ExpenseTransactionIncludeList includeList({
+    _i1.WhereExpressionBuilder<ExpenseTransactionTable>? where,
     int? limit,
     int? offset,
-    _i1.OrderByBuilder<TransactionTable>? orderBy,
+    _i1.OrderByBuilder<ExpenseTransactionTable>? orderBy,
     bool orderDescending = false,
-    _i1.OrderByListBuilder<TransactionTable>? orderByList,
-    TransactionInclude? include,
+    _i1.OrderByListBuilder<ExpenseTransactionTable>? orderByList,
+    ExpenseTransactionInclude? include,
   }) {
-    return TransactionIncludeList._(
+    return ExpenseTransactionIncludeList._(
       where: where,
       limit: limit,
       offset: offset,
-      orderBy: orderBy?.call(Transaction.t),
+      orderBy: orderBy?.call(ExpenseTransaction.t),
       orderDescending: orderDescending,
-      orderByList: orderByList?.call(Transaction.t),
+      orderByList: orderByList?.call(ExpenseTransaction.t),
       include: include,
     );
   }
@@ -183,8 +183,8 @@ abstract class Transaction
 
 class _Undefined {}
 
-class _TransactionImpl extends Transaction {
-  _TransactionImpl({
+class _ExpenseTransactionImpl extends ExpenseTransaction {
+  _ExpenseTransactionImpl({
     int? id,
     required int walletId,
     required int userId,
@@ -212,11 +212,11 @@ class _TransactionImpl extends Transaction {
           updatedAt: updatedAt,
         );
 
-  /// Returns a shallow copy of this [Transaction]
+  /// Returns a shallow copy of this [ExpenseTransaction]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
   @override
-  Transaction copyWith({
+  ExpenseTransaction copyWith({
     Object? id = _Undefined,
     int? walletId,
     int? userId,
@@ -230,7 +230,7 @@ class _TransactionImpl extends Transaction {
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
-    return Transaction(
+    return ExpenseTransaction(
       id: id is int? ? id : this.id,
       walletId: walletId ?? this.walletId,
       userId: userId ?? this.userId,
@@ -249,8 +249,9 @@ class _TransactionImpl extends Transaction {
   }
 }
 
-class TransactionTable extends _i1.Table<int?> {
-  TransactionTable({super.tableRelation}) : super(tableName: 'transactions') {
+class ExpenseTransactionTable extends _i1.Table<int?> {
+  ExpenseTransactionTable({super.tableRelation})
+      : super(tableName: 'transactions') {
     walletId = _i1.ColumnInt(
       'walletId',
       this,
@@ -339,19 +340,19 @@ class TransactionTable extends _i1.Table<int?> {
       ];
 }
 
-class TransactionInclude extends _i1.IncludeObject {
-  TransactionInclude._();
+class ExpenseTransactionInclude extends _i1.IncludeObject {
+  ExpenseTransactionInclude._();
 
   @override
   Map<String, _i1.Include?> get includes => {};
 
   @override
-  _i1.Table<int?> get table => Transaction.t;
+  _i1.Table<int?> get table => ExpenseTransaction.t;
 }
 
-class TransactionIncludeList extends _i1.IncludeList {
-  TransactionIncludeList._({
-    _i1.WhereExpressionBuilder<TransactionTable>? where,
+class ExpenseTransactionIncludeList extends _i1.IncludeList {
+  ExpenseTransactionIncludeList._({
+    _i1.WhereExpressionBuilder<ExpenseTransactionTable>? where,
     super.limit,
     super.offset,
     super.orderBy,
@@ -359,20 +360,20 @@ class TransactionIncludeList extends _i1.IncludeList {
     super.orderByList,
     super.include,
   }) {
-    super.where = where?.call(Transaction.t);
+    super.where = where?.call(ExpenseTransaction.t);
   }
 
   @override
   Map<String, _i1.Include?> get includes => include?.includes ?? {};
 
   @override
-  _i1.Table<int?> get table => Transaction.t;
+  _i1.Table<int?> get table => ExpenseTransaction.t;
 }
 
-class TransactionRepository {
-  const TransactionRepository._();
+class ExpenseTransactionRepository {
+  const ExpenseTransactionRepository._();
 
-  /// Returns a list of [Transaction]s matching the given query parameters.
+  /// Returns a list of [ExpenseTransaction]s matching the given query parameters.
   ///
   /// Use [where] to specify which items to include in the return value.
   /// If none is specified, all items will be returned.
@@ -394,20 +395,20 @@ class TransactionRepository {
   ///   limit: 100,
   /// );
   /// ```
-  Future<List<Transaction>> find(
+  Future<List<ExpenseTransaction>> find(
     _i1.Session session, {
-    _i1.WhereExpressionBuilder<TransactionTable>? where,
+    _i1.WhereExpressionBuilder<ExpenseTransactionTable>? where,
     int? limit,
     int? offset,
-    _i1.OrderByBuilder<TransactionTable>? orderBy,
+    _i1.OrderByBuilder<ExpenseTransactionTable>? orderBy,
     bool orderDescending = false,
-    _i1.OrderByListBuilder<TransactionTable>? orderByList,
+    _i1.OrderByListBuilder<ExpenseTransactionTable>? orderByList,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.find<Transaction>(
-      where: where?.call(Transaction.t),
-      orderBy: orderBy?.call(Transaction.t),
-      orderByList: orderByList?.call(Transaction.t),
+    return session.db.find<ExpenseTransaction>(
+      where: where?.call(ExpenseTransaction.t),
+      orderBy: orderBy?.call(ExpenseTransaction.t),
+      orderByList: orderByList?.call(ExpenseTransaction.t),
       orderDescending: orderDescending,
       limit: limit,
       offset: offset,
@@ -415,7 +416,7 @@ class TransactionRepository {
     );
   }
 
-  /// Returns the first matching [Transaction] matching the given query parameters.
+  /// Returns the first matching [ExpenseTransaction] matching the given query parameters.
   ///
   /// Use [where] to specify which items to include in the return value.
   /// If none is specified, all items will be returned.
@@ -432,136 +433,136 @@ class TransactionRepository {
   ///   orderBy: (t) => t.age,
   /// );
   /// ```
-  Future<Transaction?> findFirstRow(
+  Future<ExpenseTransaction?> findFirstRow(
     _i1.Session session, {
-    _i1.WhereExpressionBuilder<TransactionTable>? where,
+    _i1.WhereExpressionBuilder<ExpenseTransactionTable>? where,
     int? offset,
-    _i1.OrderByBuilder<TransactionTable>? orderBy,
+    _i1.OrderByBuilder<ExpenseTransactionTable>? orderBy,
     bool orderDescending = false,
-    _i1.OrderByListBuilder<TransactionTable>? orderByList,
+    _i1.OrderByListBuilder<ExpenseTransactionTable>? orderByList,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.findFirstRow<Transaction>(
-      where: where?.call(Transaction.t),
-      orderBy: orderBy?.call(Transaction.t),
-      orderByList: orderByList?.call(Transaction.t),
+    return session.db.findFirstRow<ExpenseTransaction>(
+      where: where?.call(ExpenseTransaction.t),
+      orderBy: orderBy?.call(ExpenseTransaction.t),
+      orderByList: orderByList?.call(ExpenseTransaction.t),
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
     );
   }
 
-  /// Finds a single [Transaction] by its [id] or null if no such row exists.
-  Future<Transaction?> findById(
+  /// Finds a single [ExpenseTransaction] by its [id] or null if no such row exists.
+  Future<ExpenseTransaction?> findById(
     _i1.Session session,
     int id, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.findById<Transaction>(
+    return session.db.findById<ExpenseTransaction>(
       id,
       transaction: transaction,
     );
   }
 
-  /// Inserts all [Transaction]s in the list and returns the inserted rows.
+  /// Inserts all [ExpenseTransaction]s in the list and returns the inserted rows.
   ///
-  /// The returned [Transaction]s will have their `id` fields set.
+  /// The returned [ExpenseTransaction]s will have their `id` fields set.
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
-  Future<List<Transaction>> insert(
+  Future<List<ExpenseTransaction>> insert(
     _i1.Session session,
-    List<Transaction> rows, {
+    List<ExpenseTransaction> rows, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.insert<Transaction>(
+    return session.db.insert<ExpenseTransaction>(
       rows,
       transaction: transaction,
     );
   }
 
-  /// Inserts a single [Transaction] and returns the inserted row.
+  /// Inserts a single [ExpenseTransaction] and returns the inserted row.
   ///
-  /// The returned [Transaction] will have its `id` field set.
-  Future<Transaction> insertRow(
+  /// The returned [ExpenseTransaction] will have its `id` field set.
+  Future<ExpenseTransaction> insertRow(
     _i1.Session session,
-    Transaction row, {
+    ExpenseTransaction row, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.insertRow<Transaction>(
+    return session.db.insertRow<ExpenseTransaction>(
       row,
       transaction: transaction,
     );
   }
 
-  /// Updates all [Transaction]s in the list and returns the updated rows. If
+  /// Updates all [ExpenseTransaction]s in the list and returns the updated rows. If
   /// [columns] is provided, only those columns will be updated. Defaults to
   /// all columns.
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
-  Future<List<Transaction>> update(
+  Future<List<ExpenseTransaction>> update(
     _i1.Session session,
-    List<Transaction> rows, {
-    _i1.ColumnSelections<TransactionTable>? columns,
+    List<ExpenseTransaction> rows, {
+    _i1.ColumnSelections<ExpenseTransactionTable>? columns,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.update<Transaction>(
+    return session.db.update<ExpenseTransaction>(
       rows,
-      columns: columns?.call(Transaction.t),
+      columns: columns?.call(ExpenseTransaction.t),
       transaction: transaction,
     );
   }
 
-  /// Updates a single [Transaction]. The row needs to have its id set.
+  /// Updates a single [ExpenseTransaction]. The row needs to have its id set.
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
-  Future<Transaction> updateRow(
+  Future<ExpenseTransaction> updateRow(
     _i1.Session session,
-    Transaction row, {
-    _i1.ColumnSelections<TransactionTable>? columns,
+    ExpenseTransaction row, {
+    _i1.ColumnSelections<ExpenseTransactionTable>? columns,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.updateRow<Transaction>(
+    return session.db.updateRow<ExpenseTransaction>(
       row,
-      columns: columns?.call(Transaction.t),
+      columns: columns?.call(ExpenseTransaction.t),
       transaction: transaction,
     );
   }
 
-  /// Deletes all [Transaction]s in the list and returns the deleted rows.
+  /// Deletes all [ExpenseTransaction]s in the list and returns the deleted rows.
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
-  Future<List<Transaction>> delete(
+  Future<List<ExpenseTransaction>> delete(
     _i1.Session session,
-    List<Transaction> rows, {
+    List<ExpenseTransaction> rows, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.delete<Transaction>(
+    return session.db.delete<ExpenseTransaction>(
       rows,
       transaction: transaction,
     );
   }
 
-  /// Deletes a single [Transaction].
-  Future<Transaction> deleteRow(
+  /// Deletes a single [ExpenseTransaction].
+  Future<ExpenseTransaction> deleteRow(
     _i1.Session session,
-    Transaction row, {
+    ExpenseTransaction row, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.deleteRow<Transaction>(
+    return session.db.deleteRow<ExpenseTransaction>(
       row,
       transaction: transaction,
     );
   }
 
   /// Deletes all rows matching the [where] expression.
-  Future<List<Transaction>> deleteWhere(
+  Future<List<ExpenseTransaction>> deleteWhere(
     _i1.Session session, {
-    required _i1.WhereExpressionBuilder<TransactionTable> where,
+    required _i1.WhereExpressionBuilder<ExpenseTransactionTable> where,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.deleteWhere<Transaction>(
-      where: where(Transaction.t),
+    return session.db.deleteWhere<ExpenseTransaction>(
+      where: where(ExpenseTransaction.t),
       transaction: transaction,
     );
   }
@@ -570,12 +571,12 @@ class TransactionRepository {
   /// will return the count of all rows in the table.
   Future<int> count(
     _i1.Session session, {
-    _i1.WhereExpressionBuilder<TransactionTable>? where,
+    _i1.WhereExpressionBuilder<ExpenseTransactionTable>? where,
     int? limit,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.count<Transaction>(
-      where: where?.call(Transaction.t),
+    return session.db.count<ExpenseTransaction>(
+      where: where?.call(ExpenseTransaction.t),
       limit: limit,
       transaction: transaction,
     );

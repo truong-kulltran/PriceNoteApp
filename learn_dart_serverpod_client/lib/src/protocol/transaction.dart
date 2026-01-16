@@ -11,8 +11,8 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 
-abstract class Transaction implements _i1.SerializableModel {
-  Transaction._({
+abstract class ExpenseTransaction implements _i1.SerializableModel {
+  ExpenseTransaction._({
     this.id,
     required this.walletId,
     required this.userId,
@@ -29,7 +29,7 @@ abstract class Transaction implements _i1.SerializableModel {
         createdAt = createdAt ?? DateTime.now(),
         updatedAt = updatedAt ?? DateTime.now();
 
-  factory Transaction({
+  factory ExpenseTransaction({
     int? id,
     required int walletId,
     required int userId,
@@ -42,10 +42,10 @@ abstract class Transaction implements _i1.SerializableModel {
     double? aiConfidenceScore,
     DateTime? createdAt,
     DateTime? updatedAt,
-  }) = _TransactionImpl;
+  }) = _ExpenseTransactionImpl;
 
-  factory Transaction.fromJson(Map<String, dynamic> jsonSerialization) {
-    return Transaction(
+  factory ExpenseTransaction.fromJson(Map<String, dynamic> jsonSerialization) {
+    return ExpenseTransaction(
       id: jsonSerialization['id'] as int?,
       walletId: jsonSerialization['walletId'] as int,
       userId: jsonSerialization['userId'] as int,
@@ -92,10 +92,10 @@ abstract class Transaction implements _i1.SerializableModel {
 
   DateTime updatedAt;
 
-  /// Returns a shallow copy of this [Transaction]
+  /// Returns a shallow copy of this [ExpenseTransaction]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
-  Transaction copyWith({
+  ExpenseTransaction copyWith({
     int? id,
     int? walletId,
     int? userId,
@@ -135,8 +135,8 @@ abstract class Transaction implements _i1.SerializableModel {
 
 class _Undefined {}
 
-class _TransactionImpl extends Transaction {
-  _TransactionImpl({
+class _ExpenseTransactionImpl extends ExpenseTransaction {
+  _ExpenseTransactionImpl({
     int? id,
     required int walletId,
     required int userId,
@@ -164,11 +164,11 @@ class _TransactionImpl extends Transaction {
           updatedAt: updatedAt,
         );
 
-  /// Returns a shallow copy of this [Transaction]
+  /// Returns a shallow copy of this [ExpenseTransaction]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
   @override
-  Transaction copyWith({
+  ExpenseTransaction copyWith({
     Object? id = _Undefined,
     int? walletId,
     int? userId,
@@ -182,7 +182,7 @@ class _TransactionImpl extends Transaction {
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
-    return Transaction(
+    return ExpenseTransaction(
       id: id is int? ? id : this.id,
       walletId: walletId ?? this.walletId,
       userId: userId ?? this.userId,

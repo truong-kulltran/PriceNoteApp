@@ -1,2 +1,37 @@
+analytics:
+  - getDailySummary:
+  - getWeeklySummary:
+  - getMonthlySummary:
+  - getYearlySummary:
+  - getCustomRangeSummary:
+  - getSpendingTrend:
+  - getCategoryComparison:
+category:
+  - createCategory:
+  - getAllCategories:
+  - getCategoriesByType:
+  - getCategoryById:
+  - updateCategory:
+  - deleteCategory:
+  - initializeDefaultCategories:
+transaction:
+  - createTransaction:
+  - getTransactionsByUserId:
+  - getTransactionsByWalletId:
+  - getTransactionsByDateRange:
+  - getTransactionById:
+  - updateTransaction:
+  - deleteTransaction:
+  - getTodayTransactions:
+  - getTotalIncome:
+  - getTotalExpenses:
+wallet:
+  - createWallet:
+  - getWalletsByUserId:
+  - getWalletById:
+  - updateWallet:
+  - archiveWallet:
+  - recalculateBalance:
+  - getTotalBalance:
 greeting:
   - hello:
