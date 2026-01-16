@@ -1,0 +1,14 @@
+class: Wallet
+table: wallets
+fields:
+  userId: int
+  name: String
+  currency: String
+  initialBalance: double
+  currentBalance: double
+  status: String, default='active'
+  createdAt: DateTime, default=now
+  updatedAt: DateTime, default=now
+indexes:
+  user_wallet_idx:
+    fields: userId

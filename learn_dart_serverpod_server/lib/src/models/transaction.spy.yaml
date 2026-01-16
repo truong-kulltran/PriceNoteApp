@@ -1,0 +1,19 @@
+class: Transaction
+table: transactions
+fields:
+  walletId: int
+  userId: int
+  type: String  # income or expense
+  amount: double
+  transactionDate: DateTime
+  categoryId: int?
+  note: String?
+  source: String, default='manual'  # manual, screenshot, invoice
+  aiConfidenceScore: double?
+  createdAt: DateTime, default=now
+  updatedAt: DateTime, default=now
+indexes:
+  wallet_idx:
+    fields: walletId
+  user_date_idx:
+    fields: userId, transactionDate

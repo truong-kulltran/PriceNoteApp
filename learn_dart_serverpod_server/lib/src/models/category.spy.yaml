@@ -1,0 +1,12 @@
+class: Category
+table: categories
+fields:
+  name: String
+  type: String  # income or expense
+  icon: String?
+  color: String?
+  isDefault: bool, default=true
+indexes:
+  name_idx:
+    fields: name
+    unique: true
