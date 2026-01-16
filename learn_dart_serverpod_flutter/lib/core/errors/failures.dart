@@ -1,4 +1,3 @@
-import 'package:dartz/dartz.dart';
 
 /// Base class for all failures in the application
 abstract class Failure {
