@@ -20,6 +20,8 @@ class AppTheme {
 
   static const Color _divider = Color(0xFF2A2A2A);
   static const Color _border = Color(0xFF303030);
+  
+  static const Color errorColor = Color(0xFFE74C3C);
 
   static ThemeData get darkTheme {
     return ThemeData(

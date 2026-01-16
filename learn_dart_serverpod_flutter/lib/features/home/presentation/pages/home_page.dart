@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../core/utils/responsive.dart';
 import '../../../../core/widgets/app_bottom_nav.dart';
+import '../../../wallet/providers/wallet_provider.dart';
+import '../../../transaction/providers/transaction_provider.dart';
+import '../../../analytics/providers/analytics_provider.dart';
 
 /// Home page - Dashboard with key financial metrics
-class HomePage extends StatelessWidget {
+class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final padding = Responsive.padding(context);
 
     return Scaffold(
@@ -33,11 +37,11 @@ class HomePage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Total Balance Card
-                _buildTotalBalanceCard(context),
+                _buildTotalBalanceCard(context, ref),
                 SizedBox(height: padding),
 
                 // Today's Summary
-                _buildTodaySummary(context),
+                _buildTodaySummary(context, ref),
                 SizedBox(height: padding),
 
                 // Quick Actions
@@ -45,7 +49,7 @@ class HomePage extends StatelessWidget {
                 SizedBox(height: padding),
 
                 // Recent Transactions
-                _buildRecentTransactions(context),
+                _buildRecentTransactions(context, ref),
               ],
             ),
           ),
@@ -60,52 +64,77 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildTotalBalanceCard(BuildContext context) {
-    // TODO: Replace with real data from provider
-    const totalBalance = 15750.50;
+  Widget _buildTotalBalanceCard(BuildContext context, WidgetRef ref) {
+    final totalBalance = ref.watch(totalBalanceProvider);
+    final walletsAsync = ref.watch(walletsProvider);
 
     return Card(
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Total Balance',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: Theme.of(context).textTheme.bodyMedium?.color,
-                  ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              CurrencyFormatter.format(totalBalance),
-              style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: AppTheme.accentColor,
-                  ),
-            ),
-            const SizedBox(height: 16),
-            Row(
+        child: walletsAsync.when(
+          data: (wallets) {
+            final income = wallets.fold<double>(
+              0,
+              (sum, wallet) => sum + (wallet.initialBalance > 0 ? wallet.initialBalance : 0),
+            );
+            final expense = wallets.fold<double>(
+              0,
+              (sum, wallet) =>
+                  sum +
+                  (wallet.currentBalance < wallet.initialBalance ? wallet.initialBalance - wallet.currentBalance : 0),
+            );
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildBalanceIndicator(
-                  context,
-                  'Income',
-                  5200.00,
-                  AppTheme.incomeColor,
-                  Icons.arrow_upward,
+                Text(
+                  'Total Balance',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: Theme.of(context).textTheme.bodyMedium?.color,
+                      ),
                 ),
-                const SizedBox(width: 24),
-                _buildBalanceIndicator(
-                  context,
-                  'Expense',
-                  3450.00,
-                  AppTheme.expenseColor,
-                  Icons.arrow_downward,
+                const SizedBox(height: 8),
+                Text(
+                  CurrencyFormatter.format(totalBalance),
+                  style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.accentColor,
+                      ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    _buildBalanceIndicator(
+                      context,
+                      'Income',
+                      income,
+                      AppTheme.incomeColor,
+                      Icons.arrow_upward,
+                    ),
+                    const SizedBox(width: 24),
+                    _buildBalanceIndicator(
+                      context,
+                      'Expense',
+                      expense,
+                      AppTheme.expenseColor,
+                      Icons.arrow_downward,
+                    ),
+                  ],
                 ),
               ],
+            );
+          },
+          loading: () => const Center(
+            child: Padding(
+              padding: EdgeInsets.all(24.0),
+              child: CircularProgressIndicator(),
             ),
-          ],
+          ),
+          error: (error, _) => Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Text('Error: $error', style: TextStyle(color: AppTheme.errorColor)),
+          ),
         ),
       ),
     );
@@ -149,9 +178,10 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildTodaySummary(BuildContext context) {
+  Widget _buildTodaySummary(BuildContext context, WidgetRef ref) {
     final columns = Responsive.gridColumns(context);
     final padding = Responsive.padding(context);
+    final todaySummary = ref.watch(todaySummaryProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -161,29 +191,48 @@ class HomePage extends StatelessWidget {
           style: Theme.of(context).textTheme.titleLarge,
         ),
         SizedBox(height: padding * 0.75),
-        GridView.count(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: columns,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-          childAspectRatio: Responsive.isMobile(context) ? 1.5 : 2.0,
-          children: [
-            _buildSummaryCard(
-              context,
-              'Expenses',
-              '450.00',
-              AppTheme.expenseColor,
-              Icons.trending_down,
-            ),
-            _buildSummaryCard(
-              context,
-              'Transactions',
-              '8',
-              AppTheme.accentColor,
-              Icons.receipt,
-            ),
-          ],
+        todaySummary.when(
+          data: (summary) {
+            final totalExpense = summary['totalExpense'] as double? ?? 0.0;
+            final totalIncome = summary['totalIncome'] as double? ?? 0.0;
+            final transactionCount = summary['transactionCount'] as int? ?? 0;
+
+            return GridView.count(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              crossAxisCount: columns,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              childAspectRatio: Responsive.isMobile(context) ? 1.5 : 2.0,
+              children: [
+                _buildSummaryCard(
+                  context,
+                  'Expenses',
+                  totalExpense.toString(),
+                  AppTheme.expenseColor,
+                  Icons.trending_down,
+                ),
+                _buildSummaryCard(
+                  context,
+                  'Income',
+                  totalIncome.toString(),
+                  AppTheme.incomeColor,
+                  Icons.trending_up,
+                ),
+                _buildSummaryCard(
+                  context,
+                  'Transactions',
+                  transactionCount.toString(),
+                  AppTheme.accentColor,
+                  Icons.receipt,
+                ),
+              ],
+            );
+          },
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, _) => Center(
+            child: Text('Error: $error', style: TextStyle(color: AppTheme.errorColor)),
+          ),
         ),
       ],
     );
@@ -322,28 +371,8 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildRecentTransactions(BuildContext context) {
-    // TODO: Replace with real data
-    final recentTransactions = [
-      {
-        'title': 'Grocery Shopping',
-        'category': 'Food',
-        'amount': -85.50,
-        'date': DateTime.now(),
-      },
-      {
-        'title': 'Salary',
-        'category': 'Income',
-        'amount': 5000.00,
-        'date': DateTime.now().subtract(const Duration(days: 1)),
-      },
-      {
-        'title': 'Transportation',
-        'category': 'Transport',
-        'amount': -25.00,
-        'date': DateTime.now().subtract(const Duration(days: 2)),
-      },
-    ];
+  Widget _buildRecentTransactions(BuildContext context, WidgetRef ref) {
+    final recentTransactions = ref.watch(recentTransactionsProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -362,33 +391,67 @@ class HomePage extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 8),
-        ...recentTransactions.map(
-          (transaction) => Card(
-            margin: const EdgeInsets.only(bottom: 8),
-            child: ListTile(
-              leading: CircleAvatar(
-                backgroundColor: (transaction['amount'] as double) > 0
-                    ? AppTheme.incomeColor.withOpacity(0.1)
-                    : AppTheme.expenseColor.withOpacity(0.1),
-                child: Icon(
-                  (transaction['amount'] as double) > 0 ? Icons.arrow_upward : Icons.arrow_downward,
-                  color: (transaction['amount'] as double) > 0 ? AppTheme.incomeColor : AppTheme.expenseColor,
-                ),
-              ),
-              title: Text(transaction['title'] as String),
-              subtitle: Text(
-                '${transaction['category']} • ${DateFormatter.formatRelative(transaction['date'] as DateTime)}',
-              ),
-              trailing: Text(
-                CurrencyFormatter.formatWithSign(
-                  transaction['amount'] as double,
-                ),
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: (transaction['amount'] as double) > 0 ? AppTheme.incomeColor : AppTheme.expenseColor,
-                      fontWeight: FontWeight.bold,
+        recentTransactions.when(
+          data: (transactions) {
+            if (transactions.isEmpty) {
+              return Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(32.0),
+                  child: Center(
+                    child: Column(
+                      children: [
+                        Icon(
+                          Icons.receipt_long_outlined,
+                          size: 48,
+                          color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.5),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No transactions yet',
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                      ],
                     ),
-              ),
-            ),
+                  ),
+                ),
+              );
+            }
+
+            return Column(
+              children: transactions.map(
+                (transaction) {
+                  final amount = transaction.type == 'income' ? transaction.amount : -transaction.amount;
+                  return Card(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor:
+                            amount > 0 ? AppTheme.incomeColor.withOpacity(0.1) : AppTheme.expenseColor.withOpacity(0.1),
+                        child: Icon(
+                          amount > 0 ? Icons.arrow_upward : Icons.arrow_downward,
+                          color: amount > 0 ? AppTheme.incomeColor : AppTheme.expenseColor,
+                        ),
+                      ),
+                      title: Text(transaction.note ?? '-'),
+                      subtitle: Text(
+                        DateFormatter.formatRelative(transaction.transactionDate),
+                      ),
+                      trailing: Text(
+                        CurrencyFormatter.formatWithSign(amount),
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              color: amount > 0 ? AppTheme.incomeColor : AppTheme.expenseColor,
+                              fontWeight: FontWeight.bold,
+                            ),
+                      ),
+                    ),
+                  );
+                },
+              ).toList(),
+            );
+          },
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, _) => Center(
+            child: Text('Error: $error', style: TextStyle(color: AppTheme.errorColor)),
           ),
         ),
       ],

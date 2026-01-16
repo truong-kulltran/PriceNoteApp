@@ -1,48 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:learn_dart_serverpod_client/learn_dart_serverpod_client.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../core/utils/responsive.dart';
 import '../../../../core/widgets/app_bottom_nav.dart';
+import '../../providers/wallet_provider.dart';
 
 /// Wallet list page showing all user wallets
-class WalletListPage extends StatelessWidget {
+class WalletListPage extends ConsumerWidget {
   const WalletListPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // TODO: Replace with real data from provider
-    final wallets = [
-      {
-        'id': 1,
-        'name': 'Cash',
-        'balance': 1250.00,
-        'currency': 'USD',
-        'icon': Icons.money,
-        'color': Colors.green,
-      },
-      {
-        'id': 2,
-        'name': 'Bank Account',
-        'balance': 12500.50,
-        'currency': 'USD',
-        'icon': Icons.account_balance,
-        'color': Colors.blue,
-      },
-      {
-        'id': 3,
-        'name': 'Credit Card',
-        'balance': 2000.00,
-        'currency': 'USD',
-        'icon': Icons.credit_card,
-        'color': Colors.purple,
-      },
-    ];
-
-    final totalBalance = wallets.fold<double>(
-      0,
-      (sum, wallet) => sum + (wallet['balance'] as double),
-    );
+  Widget build(BuildContext context, WidgetRef ref) {
+    final walletsAsync = ref.watch(walletsProvider);
+    final totalBalance = ref.watch(totalBalanceProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -87,9 +60,13 @@ class WalletListPage extends StatelessWidget {
                         ),
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    '${wallets.length} active wallets',
-                    style: Theme.of(context).textTheme.bodyMedium,
+                  walletsAsync.when(
+                    data: (wallets) => Text(
+                      '${wallets.length} active wallets',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    loading: () => const SizedBox.shrink(),
+                    error: (_, __) => const SizedBox.shrink(),
                   ),
                 ],
               ),
@@ -97,42 +74,85 @@ class WalletListPage extends StatelessWidget {
 
             // Wallet list
             Expanded(
-              child: ResponsiveBuilder(
-                mobile: (context) => ListView.builder(
-                  padding: EdgeInsets.all(Responsive.padding(context)),
-                  itemCount: wallets.length,
-                  itemBuilder: (context, index) {
-                    final wallet = wallets[index];
-                    return _buildWalletCard(context, wallet);
-                  },
-                ),
-                tablet: (context) => GridView.builder(
-                  padding: EdgeInsets.all(Responsive.padding(context)),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                    childAspectRatio: 1.8,
+              child: walletsAsync.when(
+                data: (wallets) {
+                  if (wallets.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.account_balance_wallet_outlined,
+                            size: 64,
+                            color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.5),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'No wallets yet',
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Add your first wallet to get started',
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  return ResponsiveBuilder(
+                    mobile: (context) => ListView.builder(
+                      padding: EdgeInsets.all(Responsive.padding(context)),
+                      itemCount: wallets.length,
+                      itemBuilder: (context, index) {
+                        final wallet = wallets[index];
+                        return _buildWalletCard(context, wallet);
+                      },
+                    ),
+                    tablet: (context) => GridView.builder(
+                      padding: EdgeInsets.all(Responsive.padding(context)),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                        childAspectRatio: 1.8,
+                      ),
+                      itemCount: wallets.length,
+                      itemBuilder: (context, index) {
+                        final wallet = wallets[index];
+                        return _buildWalletCard(context, wallet);
+                      },
+                    ),
+                    desktop: (context) => GridView.builder(
+                      padding: EdgeInsets.all(Responsive.padding(context)),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                        childAspectRatio: 1.8,
+                      ),
+                      itemCount: wallets.length,
+                      itemBuilder: (context, index) {
+                        final wallet = wallets[index];
+                        return _buildWalletCard(context, wallet);
+                      },
+                    ),
+                  );
+                },
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (error, _) => Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Error: $error', style: TextStyle(color: AppTheme.expenseColor)),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () => ref.invalidate(walletsProvider),
+                        child: const Text('Retry'),
+                      ),
+                    ],
                   ),
-                  itemCount: wallets.length,
-                  itemBuilder: (context, index) {
-                    final wallet = wallets[index];
-                    return _buildWalletCard(context, wallet);
-                  },
-                ),
-                desktop: (context) => GridView.builder(
-                  padding: EdgeInsets.all(Responsive.padding(context)),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                    childAspectRatio: 1.8,
-                  ),
-                  itemCount: wallets.length,
-                  itemBuilder: (context, index) {
-                    final wallet = wallets[index];
-                    return _buildWalletCard(context, wallet);
-                  },
                 ),
               ),
             ),
@@ -143,11 +163,24 @@ class WalletListPage extends StatelessWidget {
     );
   }
 
-  Widget _buildWalletCard(BuildContext context, Map<String, dynamic> wallet) {
+  Widget _buildWalletCard(BuildContext context, Wallet wallet) {
+    // Map wallet types to icons and colors
+    final iconData = wallet.name.toLowerCase().contains('cash')
+        ? Icons.money
+        : wallet.name.toLowerCase().contains('bank')
+            ? Icons.account_balance
+            : Icons.account_balance_wallet;
+
+    final color = wallet.name.toLowerCase().contains('cash')
+        ? Colors.green
+        : wallet.name.toLowerCase().contains('bank')
+            ? Colors.blue
+            : AppTheme.accentColor;
+
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: InkWell(
-        onTap: () => context.push('/wallets/${wallet['id']}'),
+        onTap: () => context.push('/wallets/${wallet.id}'),
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -157,12 +190,12 @@ class WalletListPage extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: (wallet['color'] as Color).withOpacity(0.1),
+                  color: color.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
-                  wallet['icon'] as IconData,
-                  color: wallet['color'] as Color,
+                  iconData,
+                  color: color,
                   size: 28,
                 ),
               ),
@@ -174,7 +207,7 @@ class WalletListPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      wallet['name'] as String,
+                      wallet.name,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w600,
                           ),
@@ -182,8 +215,8 @@ class WalletListPage extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       CurrencyFormatter.format(
-                        wallet['balance'] as double,
-                        currency: wallet['currency'] as String,
+                        wallet.currentBalance,
+                        currency: wallet.currency,
                       ),
                       style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                             fontWeight: FontWeight.bold,
